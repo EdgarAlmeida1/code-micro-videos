@@ -21,7 +21,7 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate($rules);
+        $this->validate($request, $this->rules);
         $category = Category::create($request->all());
         $category->refresh();
         return $category;
@@ -34,7 +34,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $request->validate($this->rules);
+        $this->validate($request, $this->rules);
         $category->update($request->all());
         return $category;
     }
