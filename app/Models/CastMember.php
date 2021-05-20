@@ -16,6 +16,7 @@ class CastMember extends Model
     protected $dates = ['deleted_at'];
     protected $casts = [
         'id' => 'string',
+        'type' => 'smallint'
     ];
     public $incrementing = false;
     protected $keyType = 'string';

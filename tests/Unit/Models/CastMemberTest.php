@@ -25,7 +25,7 @@ class CastMemberTest extends TestCase
 
     public function testCastsAttribute()
     {
-        $casts = ['id' => 'string'];
+        $casts = ['id' => 'string', 'type' => 'smallint'];
         $castMember = new CastMember();
         $this->assertEquals($casts, $castMember->getCasts());
     }
