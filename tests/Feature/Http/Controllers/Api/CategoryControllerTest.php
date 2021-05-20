@@ -107,22 +107,6 @@ class CategoryControllerTest extends TestCase
         $this->assertNotNull(Category::withTrashed()->find($this->category->id));
     }
 
-    protected function assertInvalidationRequired(TestResponse $response)
-    {
-        $this->assertInvalidationFields($response, ['name'], 'required');
-        $response->assertJsonMissingValidationErrors(['is_active']);
-    }
-
-    protected function assertInvalidationMax(TestResponse $response)
-    {
-        $this->assertInvalidationFields($response, ['name'], 'max.string', ['max' => 255]);
-    }
-
-    protected function assertInvalidationBoolean(TestResponse $response)
-    {
-        $this->assertInvalidationFields($response, ['is_active'], 'boolean');
-    }
-
     protected function routeStore()
     {
         return route('categories.store');
