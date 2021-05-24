@@ -1,16 +1,18 @@
-## Descrição
+## Description
 
-Microsserviço de catálogo
+Back-end microservice for CodeFlix project used on Full Cycle Development course.
+Made with Laravel, using docker.
+Includes 4 containers: the application, database, Redis, and Nginx.
 
-## Rodar a aplicação
+## How to run
 
-#### Crie os containers com Docker
+#### Docker
 
 ```bash
-$ docker-compose up
+$ docker-compose up -d
 ```
 
-#### Accesse no browser
+#### Access
 
 ```
 http://localhost:8000
