@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\BasicCrudController;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Mockery;
@@ -75,6 +76,17 @@ class BasicCrudControllerTest extends TestCase
 
         $result = $reflectionMethod->invokeArgs($this->controller, [$category->id]);
         $this->assertInstanceOf(CategoryStub::class, $result);
+    }
+
+    public function testIfFindOrFailThrowExceptionWhenIdInvalid()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $reflectionClass = new \ReflectionClass(BasicCrudController::class);
+        $reflectionMethod = $reflectionClass->getMethod('findOrFail');
+        $reflectionMethod->setAccessible(true);
+
+        $reflectionMethod->invokeArgs($this->controller, [0]);
     }
 
     public function testShow()
