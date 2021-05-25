@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Traits\Uuid;
 
-class CastMemberTest extends TestCase
+class CastMemberUnitTest extends TestCase
 {
     public function testFillableAttribute()
     {
