@@ -235,6 +235,11 @@ class VideoControllerTest extends TestCase
         $controller = Mockery::mock(VideoController::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
         $controller
+            ->shouldReceive("addRuleIfGenreHasCategories")
+            ->once()
+            ->andReturn([]);
+
+        $controller
             ->shouldReceive("validate")
             ->withAnyArgs()
             ->andReturn($this->sendData);
@@ -270,6 +275,11 @@ class VideoControllerTest extends TestCase
             ->shouldReceive("findOrFail")
             ->withAnyArgs()
             ->andReturn($this->video);
+
+        $controller
+            ->shouldReceive("addRuleIfGenreHasCategories")
+            ->once()
+            ->andReturn([]);
 
         $controller
             ->shouldReceive("validate")
@@ -313,7 +323,7 @@ class VideoControllerTest extends TestCase
         $categoriesId = factory(Category::class, 3)->create()->pluck("id")->toArray();
         $genre = factory(Genre::class)->create();
         $genre->categories()->sync($categoriesId);
-            
+
         $response = $this->json("POST", $this->routeStore(), $this->sendData + [
             'genres_id' => [$genre->id],
             'categories_id' => [$categoriesId[0]]
@@ -347,11 +357,10 @@ class VideoControllerTest extends TestCase
         $genres = factory(Genre::class, 3)->create();
         $genresId = $genres->pluck("id")->toArray();
         $categoryId = factory(Category::class)->create()->id;
-        $genres->each(function($genre) use ($categoryId) {
+        $genres->each(function ($genre) use ($categoryId) {
             $genre->categories()->sync($categoryId);
         });
 
-            
         $response = $this->json("POST", $this->routeStore(), $this->sendData + [
             'genres_id' => [$genresId[0]],
             'categories_id' => [$categoryId]
