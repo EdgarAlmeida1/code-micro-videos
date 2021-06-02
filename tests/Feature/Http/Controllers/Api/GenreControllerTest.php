@@ -91,6 +91,10 @@ class GenreControllerTest extends TestCase
         ];
         $response = $this->assertStore($data + ['categories_id' => [$category->id]], $data + ['is_active' => true, 'deleted_at' => null]);
 
+        $response->assertJsonStructure([
+            'created_at', 'updated_at'
+        ]);
+
         $this->assertHasCategory($response->json("id"), $category->id);
 
         $data = [

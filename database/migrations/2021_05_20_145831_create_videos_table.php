@@ -21,6 +21,8 @@ class CreateVideosTable extends Migration
             $table->boolean('opened')->default(false);
             $table->string('rating', 3);
             $table->smallInteger('duration');
+            $table->string('video_file')->nullable();
+            $table->string('thumb_file')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
