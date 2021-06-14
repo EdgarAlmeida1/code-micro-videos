@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Traits;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 trait TestUploads
 {
@@ -33,6 +34,13 @@ trait TestUploads
                 $field => $file
             ]);
             $this->assertInvalidationFields($response, [$field], 'max.file', ['max' => $maxSize]);
+        }
+    }
+
+    protected function assertFilesExistsInStorage($model, array $files)
+    {
+        foreach($files as $file){
+            Storage::assertExists($model->relativeFilePath($file->hashName()));
         }
     }
 }
