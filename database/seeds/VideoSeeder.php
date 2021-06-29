@@ -30,7 +30,7 @@ class VideoSeeder extends Seeder
         $this->allGenres = Genre::all();
 
         Model::reguard();
-        factory(Video::class, 30)->create()->make()
+        factory(Video::class, 30)->make()
             ->each(function (Video $video) use ($self) {
                 $self->fetchRelations();
                 Video::create(

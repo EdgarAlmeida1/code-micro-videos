@@ -2,29 +2,52 @@
 
 namespace Tests\Feature\Http\Controllers\Api\VideoController;
 
+use App\Http\Resources\VideoResource;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
+use Tests\Traits\TestResources;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
 class VideoControllerCRUDTest extends BaseVideoControllerTestCase
 {
-    use TestValidations, TestSaves;
+    use TestValidations, TestSaves, TestResources;
 
 
     public function testIndex()
     {
         $response = $this->get(route('videos.index'));
 
-        $response->assertStatus(200)->assertJson([$this->video->toArray()]);
+        $response
+            ->assertStatus(200)
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => $this->serializedFields
+                ],
+                'links' => [],
+                'meta' => [],
+            ]);
+
+        $resource = VideoResource::collection(collect([$this->video]));
+        $this->assertResource($response, $resource);
     }
 
     public function testShow()
     {
         $response = $this->get(route('videos.show', ['video' => $this->video->id]));
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => $this->serializedFields
+            ]);
 
-        $response->assertStatus(200)->assertJson($this->video->toArray());
+        $id = $response->json('data.id');
+        $resource = new VideoResource(Video::find($id));
+        $this->assertResource($response, $resource);
     }
 
     public function testInvalidationRequired()
@@ -164,19 +187,17 @@ class VideoControllerCRUDTest extends BaseVideoControllerTestCase
         foreach ($data as $key => $value) {
             $response = $this->assertStore($value["send_data"], $value["test_data"] + ['deleted_at' => null]);
             $response->assertJsonStructure([
-                'created_at',
-                'updated_at'
+                'data' => $this->serializedFields
             ]);
-            $this->assertHasCategory($response->json("id"), $this->category->id);
-            $this->assertHasGenre($response->json("id"), $this->genre->id);
+            $this->assertHasCategory($response->json("data.id"), $this->category->id);
+            $this->assertHasGenre($response->json("data.id"), $this->genre->id);
 
             $response = $this->assertUpdate($value["send_data"], $value["test_data"] + ['deleted_at' => null]);
             $response->assertJsonStructure([
-                'created_at',
-                'updated_at'
+                'data' => $this->serializedFields
             ]);
-            $this->assertHasCategory($response->json("id"), $this->category->id);
-            $this->assertHasGenre($response->json("id"), $this->genre->id);
+            $this->assertHasCategory($response->json("data.id"), $this->category->id);
+            $this->assertHasGenre($response->json("data.id"), $this->genre->id);
         }
     }
 
