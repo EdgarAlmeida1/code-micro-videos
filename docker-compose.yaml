@@ -5,7 +5,7 @@ services:
     app:
         build: .
         container_name: micro-videos-app
-        entrypoint: dockerize -template ./.docker/app/.env:.env -template ./.docker/app/.env.testing:.env.testing -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
+        entrypoint: dockerize -template ./.docker/app/.env:./backend/.env -template ./.docker/app/.env.testing:./backend/.env.testing -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
         environment:
             - _DB_HOST=db
             - _DB_DATABASE=code_micro_videos
@@ -14,6 +14,11 @@ services:
             - _DB_DATABASE_TEST=code_micro_videos_test
         volumes:
             - .:/var/www
+        ports:
+            - "3000:3000"
+            - "35729:35729"
+        environment:
+            - CHOKIDAR_USEPOLLING=true
         networks:
             - app-network
         depends_on:
