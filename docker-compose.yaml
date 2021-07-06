@@ -12,13 +12,12 @@ services:
             - _DB_USERNAME=root
             - _DB_PASSWORD=root
             - _DB_DATABASE_TEST=code_micro_videos_test
+            - CHOKIDAR_USEPOLLING=true
         volumes:
             - .:/var/www
         ports:
             - "3000:3000"
-            - "35729:35729"
-        environment:
-            - CHOKIDAR_USEPOLLING=true
+            - "35729:35729"    
         networks:
             - app-network
         depends_on:
