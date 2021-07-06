@@ -2,12 +2,12 @@ name: Laravel
 
 on:
   push:
-    paths-ignore:
-    - 'README.md'
+    paths:
+      - 'backend/**'
     branches: [ develop ]
   pull_request:
-    paths-ignore:
-    - 'README.md'
+    paths:
+      - 'backend/**'
     branches: [ develop ]
 
 jobs:
