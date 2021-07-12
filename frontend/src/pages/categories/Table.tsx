@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { format, parseISO } from "date-fns";
-import categoryHttp from '../../util/http/category_http';
+import categoryHttp from '../../util/http/models_http/category_http';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {

@@ -3,7 +3,7 @@ import MuiDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import * as React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { httpVideo } from '../../util/http';
+import genreHttp from '../../util/http/models_http/genre_http';
 import { format, parseISO } from "date-fns";
 
 const columnsDefinition: MUIDataTableColumn[] = [
@@ -47,7 +47,7 @@ type Props = {};
 const Table = (props: Props) => {
     const [data, setData] = useState([])
     useEffect(() => {
-        httpVideo.get('genres').then(
+        genreHttp.list().then(
             response => setData(response.data.data)
         )
     }, [])
