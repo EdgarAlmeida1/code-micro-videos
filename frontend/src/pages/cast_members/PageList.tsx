@@ -7,10 +7,11 @@ import Table from './Table';
 
 const List = () => {
     return (
-        <Page title={"Listagem de membros do elenco"}>
-            <Box dir={'rtl'}>
+        <Page title={"Listagem de membros de elenco"}>
+            <Box dir={'rtl'} paddingBottom={2}>
                 <Fab
-                    title="Adicionar membro do elenco"
+                    title="Adicionar membro de elenco"
+                    color={"secondary"}
                     size="small"
                     component={Link}
                     to="/cast_members/create"

@@ -1,10 +1,10 @@
-import { Chip } from '@material-ui/core';
 import MuiDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import * as React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { format, parseISO } from "date-fns";
 import categoryHttp from '../../util/http/models_http/category_http';
+import { BadgeNo, BadgeYes } from '../../components/Badge';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -16,7 +16,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
         label: "Ativo?",
         options: {
             customBodyRender(value, tableMeta, updateValue) {
-                return value ? <Chip label="Sim" color="primary"/> : <Chip label="Não" color="secondary"/> 
+                return value ? <BadgeYes />: <BadgeNo />
             }
         }
     },

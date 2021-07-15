@@ -16,12 +16,12 @@ routes.forEach(route => breadcrumbNameMap[route.path as string] = route.label)
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     itemRouter: {
-      color: "#4db5ab",
+      color: theme.palette.secondary.main,
       "&:focus, &:active": {
-        color: "#4db5ab",
+        color: theme.palette.secondary.main
       },
       "&:hover": {
-        color: "#055a52",
+        color: theme.palette.secondary.dark
       }
     }
   }),
@@ -70,7 +70,7 @@ export default function Breadcrumbs() {
 
   return (
     <Container>
-      <Box paddingBottom={1}>
+      <Box paddingTop={2} paddingBottom={1}>
         <Route>
           {
             ({ location }) => makeBreadcrumbs(location)
