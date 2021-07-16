@@ -2,7 +2,7 @@ import MuiDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import * as React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { httpVideo } from '../../util/http';
+import castMemberHttp from '../../util/http/models_http/cast_member_http';
 import { format, parseISO } from "date-fns";
 
 const CastMemberTypes = {
@@ -39,9 +39,10 @@ type Props = {};
 const Table = (props: Props) => {
     const [data, setData] = useState([])
     useEffect(() => {
-        httpVideo.get('cast_members').then(
-            response => setData(response.data.data)
-        )
+        (async function getCastMembers() {
+            const { data } = await castMemberHttp.list()
+            setData(data.data)
+        })()
     }, [])
 
     return (

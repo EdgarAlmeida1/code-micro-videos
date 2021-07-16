@@ -41,9 +41,10 @@ const Table = (props: Props) => {
     const [data, setData] = useState<Category[]>([])
 
     useEffect(() => {
-        categoryHttp
-            .list<{data: Category[]}>()
-            .then(response => setData(response.data.data))
+        (async function getCategories() {
+            const { data } = await categoryHttp.list()
+            setData(data.data)
+        })()
     }, [])
 
     return (

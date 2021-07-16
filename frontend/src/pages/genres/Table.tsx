@@ -47,9 +47,10 @@ type Props = {};
 const Table = (props: Props) => {
     const [data, setData] = useState([])
     useEffect(() => {
-        genreHttp.list().then(
-            response => setData(response.data.data)
-        )
+        (async function getGenres() {
+            const { data } = await genreHttp.list()
+            setData(data.data)
+        })()
     }, [])
 
     return (
