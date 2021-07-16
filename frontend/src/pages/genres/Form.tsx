@@ -2,9 +2,13 @@ import { Box, Button, makeStyles, MenuItem, TextField, Theme } from '@material-u
 import { ButtonProps } from '@material-ui/core/Button';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import categoryHttp from '../../util/http/models_http/category_http';
 import genreHttp from '../../util/http/models_http/genre_http';
+import * as yup from '../../util/vendor/yup';
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useHistory, useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -14,68 +18,176 @@ const useStyles = makeStyles((theme: Theme) => {
     }
 })
 
+const validationSchema = yup.object().shape({
+    name: yup.string()
+        .label("Nome")
+        .required()
+        .max(255),
+    categories_id: yup.array()
+        .label("Categorias")
+        .required()
+        .min(1)
+})
+
 export const Form = () => {
-    const [categories, setCategories] = useState<any[]>([]);
+    const {
+        handleSubmit,
+        getValues,
+        control,
+        formState: { errors },
+        reset
+    } = useForm({
+        defaultValues: {
+            name: "",
+            categories_id: []
+        },
+        resolver: yupResolver(validationSchema)
+    });
     const classes = useStyles();
+    const snackbar = useSnackbar();
+    const history = useHistory();
+    const { id } = useParams<{ id }>();
+    const [genre, setGenre] = useState<any>(null)
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+
+        async function loadData() {
+            setLoading(true);
+            
+            const promises = [categoryHttp.list()]
+            if (id) promises.push(genreHttp.get(id))
+
+            try {
+                const [categoriesResponse, genreResponse] = await Promise.all(promises);
+                
+                setCategories(categoriesResponse.data.data)
+                if(id) {
+                    setGenre(genreResponse.data.data)
+
+                    reset({
+                        ...genreResponse.data.data, 
+                        categories_id: genreResponse.data.data.categories.map(category => category.id)
+                    })
+                }
+            } catch (error) {
+                console.log(error);
+                snackbar.enqueueSnackbar(
+                    "Não foi possível carregar as informações",
+                    { variant: "error" }
+                )
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadData();
+
+    }, [id, reset, snackbar])
+
+
+    async function onSubmit(formData, event) {
+        setLoading(true);
+
+        try {
+            const http = !id
+                ? genreHttp.create(formData)
+                : genreHttp.update(genre!.id, formData)
+            const { data } = await http
+
+            snackbar.enqueueSnackbar(
+                "Gênero salvo com sucesso",
+                { variant: "success" }
+            )
+            setTimeout(() => {
+                event
+                    ? (
+                        id
+                            ? history.replace(`/genres/${data.data.id}/edit`)
+                            : history.push(`/genres/${data.data.id}/edit`)
+                    )
+                    : history.push("/genres")
+            })
+
+        } catch (error) {
+            console.log(error)
+            snackbar.enqueueSnackbar(
+                "Não foi possível salvar a gênero",
+                { variant: "error" }
+            )
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const buttonProps: ButtonProps = {
         variant: "contained",
         color: "secondary",
-        className: classes.submit
+        className: classes.submit,
+        disabled: loading
     };
 
-    useEffect(() => {
-        categoryHttp
-            .list()
-            .then(({ data }) => setCategories(data.data))
-    }, [])
-
-    const { register, handleSubmit, getValues, setValue, watch } = useForm({
-        defaultValues: {
-            name: "",
-            categories_id: []
-        }
-    });
-
-    function onSubmit(formData, event) {
-        genreHttp
-            .create(formData)
-            .then((response) => console.log(response))
-    }
+    console.log(getValues())
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <TextField
-                {...register("name")}
-                label="Nome"
-                fullWidth
-                variant={"outlined"}
-                onChange={(event) => setValue("name", event.target.value)}
+            <Controller
+                name="name"
+                control={control}
+                render={({ field, formState }) => {
+                    return (
+                        <TextField
+                            {...field}
+                            label="Nome"
+                            fullWidth
+                            variant={"outlined"}
+                            error={errors.name !== undefined}
+                            helperText={errors.name?.message}
+                            InputLabelProps={{ shrink: true }}
+                            disabled={loading}
+                        />
+                    )
+                }}
             />
 
-            <TextField
-                {...register("categories_id")}
-                label="Categorias"
-                value={watch("categories_id")}
-                fullWidth
-                select
-                variant={"outlined"}
-                SelectProps={{
-                    multiple: true
+            <Controller
+                name="categories_id"
+                control={control}
+                render={({ field, formState }) => {
+                    return (
+                        <TextField
+                            {...field}
+                            label="Categorias"
+                            fullWidth
+                            select
+                            variant={"outlined"}
+                            SelectProps={{
+                                multiple: true
+                            }}
+                            margin="normal"
+                            error={errors.categories_id !== undefined}
+                            helperText={
+                                // @ts-ignore
+                                errors.categories_id?.message
+                            }
+                            InputLabelProps={{ shrink: true }}
+                            disabled={loading}
+                        >
+                            <MenuItem value="" disabled>
+                                <em>Selecione categorias:</em>
+                            </MenuItem>
+                            {
+                                categories.map((category, key) => (
+                                    <MenuItem key={key} value={category.id}>
+                                        {category.name}
+                                    </MenuItem>
+                                ))
+                            }
+                        </TextField>
+                    )
                 }}
-                margin="normal"
-            >
-                <MenuItem value="" disabled>
-                    <em>Selecione categorias:</em>
-                </MenuItem>
-                {
-                    categories.map((category, key) => (
-                        <MenuItem key={key} value={category.id}>
-                            {category.name}
-                        </MenuItem>
-                    ))
-                }
-            </TextField>
+            />
 
             <Box dir={"rtl"}>
                 <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>

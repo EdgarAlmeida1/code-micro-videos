@@ -1,10 +1,10 @@
 import { RouteProps } from "react-router-dom"
 import CategoryList from "../pages/categories/PageList";
-import CategoryCreate from "../pages/categories/PageForm";
+import CategoryForm from "../pages/categories/PageForm";
 import GenreList from "../pages/genres/PageList";
-import GenreCreate from "../pages/genres/PageForm";
+import GenreForm from "../pages/genres/PageForm";
 import CastMemberList from "../pages/cast_members/PageList";
-import CastMemberCreate from "../pages/cast_members/PageForm";
+import CastMemberForm from "../pages/cast_members/PageForm";
 import Dashboard from "../pages/Dashboard";
 
 export interface MyRouteProps extends RouteProps{
@@ -31,9 +31,16 @@ const routes: MyRouteProps[] = [
     },
     {
         name: 'categories.create',
-        label: "Criar categorias",
+        label: "Criar categoria",
         path: "/categories/create",
-        component: CategoryCreate,
+        component: CategoryForm,
+        exact: true
+    },
+    {
+        name: 'categories.edit',
+        label: "Editar categoria",
+        path: "/categories/:id/edit",
+        component: CategoryForm,
         exact: true
     },
 
@@ -49,23 +56,37 @@ const routes: MyRouteProps[] = [
         name: 'genres.create',
         label: "Criar gênero",
         path: "/genres/create",
-        component: GenreCreate,
+        component: GenreForm,
+        exact: true
+    },
+    {
+        name: 'genres.edit',
+        label: "Editar gênero",
+        path: "/genres/:id/edit",
+        component: GenreForm,
         exact: true
     },
 
     // Membros do elenco
     {
         name: 'cast_members.list',
-        label: "Listar membros do elenco",
+        label: "Listar membros de elenco",
         path: "/cast_members",
         component: CastMemberList,
         exact: true
     },
     {
         name: 'cast_members.create',
-        label: "Criar membros do elenco",
+        label: "Criar membro de elenco",
         path: "/cast_members/create",
-        component: CastMemberCreate,
+        component: CastMemberForm,
+        exact: true
+    },
+    {
+        name: 'cast_members.edit',
+        label: "Editar membro de elenco",
+        path: "/cast_members/:id/edit",
+        component: CastMemberForm,
         exact: true
     },
 ];
