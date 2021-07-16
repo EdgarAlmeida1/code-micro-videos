@@ -61,7 +61,7 @@ export const Form = () => {
                 data.data.type = data.data.type.toString()
                 reset(data.data)
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 snackbar.enqueueSnackbar(
                     "Não foi possível carregar as informações",
                     { variant: "error" }
@@ -99,7 +99,7 @@ export const Form = () => {
                     : history.push("/cast_members")
             })
         } catch (error) {
-            console.log(error)
+            console.error(error)
             snackbar.enqueueSnackbar(
                 "Não foi possível salvar o membro de elenco",
                 { variant: "error" }

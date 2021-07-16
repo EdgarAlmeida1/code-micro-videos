@@ -72,7 +72,7 @@ export const Form = () => {
                     })
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 snackbar.enqueueSnackbar(
                     "Não foi possível carregar as informações",
                     { variant: "error" }
@@ -111,7 +111,7 @@ export const Form = () => {
             })
 
         } catch (error) {
-            console.log(error)
+            console.error(error)
             snackbar.enqueueSnackbar(
                 "Não foi possível salvar a gênero",
                 { variant: "error" }
@@ -127,8 +127,6 @@ export const Form = () => {
         className: classes.submit,
         disabled: loading
     };
-
-    console.log(getValues())
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>

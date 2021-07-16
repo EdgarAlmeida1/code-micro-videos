@@ -58,7 +58,7 @@ export const Form = () => {
                 setCategory(data.data)
                 reset(data.data)
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 snackbar.enqueueSnackbar(
                     "Não foi possível carregar as informações",
                     { variant: "error" }
@@ -96,7 +96,7 @@ export const Form = () => {
             })
 
         } catch (error) {
-            console.log(error)
+            console.error(error)
             snackbar.enqueueSnackbar(
                 "Não foi possível salvar a categoria",
                 { variant: "error" }
