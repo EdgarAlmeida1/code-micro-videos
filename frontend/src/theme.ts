@@ -55,6 +55,7 @@ const theme = createMuiTheme({
                 paddingTop: 8,
                 paddingBottom: 8,
                 backgroundColor: (palette.primary as SimplePaletteColorOptions).main,
+                color: "#fff",
                 "&[aria-sort]":{
                     backgroundColor: "#459ac4"
                 }
