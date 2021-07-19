@@ -8,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { Category } from '../../util/models';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -45,18 +46,21 @@ export const Form = () => {
     const snackbar = useSnackbar();
     const history = useHistory();
     const { id } = useParams<{ id }>();
-    const [category, setCategory] = useState<any>(null)
+    const [category, setCategory] = useState<Category | null>(null)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (!id) return
+        let isSubscribed = true;
 
-        async function getCategory() {
+        (async function getCategory() {
             setLoading(true);
             try {
                 const { data } = await categoryHttp.get(id)
-                setCategory(data.data)
-                reset(data.data)
+                if (isSubscribed) {
+                    setCategory(data.data)
+                    reset(data.data)
+                }
             } catch (error) {
                 console.error(error);
                 snackbar.enqueueSnackbar(
@@ -66,9 +70,11 @@ export const Form = () => {
             } finally {
                 setLoading(false)
             }
-        }
+        })()
 
-        getCategory();
+        return () => {
+            isSubscribed = false;
+        }
 
     }, [id, reset, snackbar])
 

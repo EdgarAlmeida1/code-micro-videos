@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { format, parseISO } from "date-fns";
 import categoryHttp from '../../util/http/models_http/category_http';
 import { BadgeNo, BadgeYes } from '../../components/Badge';
+import { Category, ListResponse } from '../../util/models';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -16,7 +17,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
         label: "Ativo?",
         options: {
             customBodyRender(value, tableMeta, updateValue) {
-                return value ? <BadgeYes />: <BadgeNo />
+                return value ? <BadgeYes /> : <BadgeNo />
             }
         }
     },
@@ -31,20 +32,23 @@ const columnsDefinition: MUIDataTableColumn[] = [
     },
 ];
 
-interface Category{
-    id: string;
-    name: string;
-}
-
 type Props = {};
 const Table = (props: Props) => {
     const [data, setData] = useState<Category[]>([])
 
     useEffect(() => {
+        let isSubscribed = true;
+
         (async function getCategories() {
-            const { data } = await categoryHttp.list()
-            setData(data.data)
+            const { data } = await categoryHttp.list<ListResponse<Category>>()
+            if (isSubscribed) {
+                setData(data.data)
+            }
         })()
+
+        return () => {
+            isSubscribed = false;
+        }
     }, [])
 
     return (

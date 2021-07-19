@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import castMemberHttp from '../../util/http/models_http/cast_member_http';
 import { format, parseISO } from "date-fns";
+import { CastMember, ListResponse } from '../../util/models';
 
 const CastMemberTypes = {
     1: "Diretor",
@@ -37,12 +38,20 @@ const columnsDefinition: MUIDataTableColumn[] = [
 
 type Props = {};
 const Table = (props: Props) => {
-    const [data, setData] = useState([])
+    const [data, setData] = useState<CastMember[]>([])
     useEffect(() => {
+        let isSubscribed = true;
+
         (async function getCastMembers() {
-            const { data } = await castMemberHttp.list()
-            setData(data.data)
+            const { data } = await castMemberHttp.list<ListResponse<CastMember>>()
+            if (isSubscribed) {
+                setData(data.data)
+            }
         })()
+
+        return () => {
+            isSubscribed = false;
+        }
     }, [])
 
     return (

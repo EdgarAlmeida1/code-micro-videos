@@ -8,6 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { CastMember } from '../../util/models';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -46,20 +47,24 @@ export const Form = () => {
     const snackbar = useSnackbar();
     const history = useHistory();
     const { id } = useParams<{ id }>();
-    const [castMember, setCastMember] = useState<any>(null)
+    const [castMember, setCastMember] = useState<CastMember | null>(null)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (!id) return
 
-        async function getCastMember() {
+        let isSubscribed = true;
+        (async function getCastMember() {
             setLoading(true);
             try {
                 const { data } = await castMemberHttp.get(id)
-                setCastMember(data.data)
-                // The type attribute is a number, so I change it to string to use on the form
-                data.data.type = data.data.type.toString()
-                reset(data.data)
+
+                if (isSubscribed) {
+                    setCastMember(data.data)
+                    // The type attribute is a number, so I change it to string to use on the form
+                    data.data.type = data.data.type.toString()
+                    reset(data.data)
+                }
             } catch (error) {
                 console.error(error);
                 snackbar.enqueueSnackbar(
@@ -70,9 +75,11 @@ export const Form = () => {
             } finally {
                 setLoading(false)
             }
-        }
+        })()
 
-        getCastMember()
+        return () => {
+            isSubscribed = false;
+        }
 
     }, [id, reset, snackbar])
 

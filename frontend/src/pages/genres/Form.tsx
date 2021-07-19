@@ -9,6 +9,7 @@ import * as yup from '../../util/vendor/yup';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useHistory, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { Category, Genre } from '../../util/models';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -47,29 +48,32 @@ export const Form = () => {
     const snackbar = useSnackbar();
     const history = useHistory();
     const { id } = useParams<{ id }>();
-    const [genre, setGenre] = useState<any>(null)
-    const [categories, setCategories] = useState<any[]>([]);
+    const [genre, setGenre] = useState<Genre | null>(null)
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
+        let isSubscribed = true;
 
-        async function loadData() {
+        (async function loadData() {
             setLoading(true);
-            
+
             const promises = [categoryHttp.list()]
             if (id) promises.push(genreHttp.get(id))
 
             try {
                 const [categoriesResponse, genreResponse] = await Promise.all(promises);
-                
-                setCategories(categoriesResponse.data.data)
-                if(id) {
-                    setGenre(genreResponse.data.data)
 
-                    reset({
-                        ...genreResponse.data.data, 
-                        categories_id: genreResponse.data.data.categories.map(category => category.id)
-                    })
+                if (isSubscribed) {
+                    setCategories(categoriesResponse.data.data)
+                    if (id) {
+                        setGenre(genreResponse.data.data)
+
+                        reset({
+                            ...genreResponse.data.data,
+                            categories_id: genreResponse.data.data.categories.map(category => category.id)
+                        })
+                    }
                 }
             } catch (error) {
                 console.error(error);
@@ -80,9 +84,11 @@ export const Form = () => {
             } finally {
                 setLoading(false);
             }
-        }
+        })()
 
-        loadData();
+        return () => {
+            isSubscribed = false;
+        }
 
     }, [id, reset, snackbar])
 

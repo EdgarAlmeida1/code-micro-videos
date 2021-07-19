@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import genreHttp from '../../util/http/models_http/genre_http';
 import { format, parseISO } from "date-fns";
+import { Genre, ListResponse } from '../../util/models';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -45,12 +46,20 @@ const columnsDefinition: MUIDataTableColumn[] = [
 
 type Props = {};
 const Table = (props: Props) => {
-    const [data, setData] = useState([])
+    const [data, setData] = useState<Genre[]>([])
     useEffect(() => {
+        let isSubscribed = true;
+
         (async function getGenres() {
-            const { data } = await genreHttp.list()
-            setData(data.data)
+            const { data } = await genreHttp.list<ListResponse<Genre>>()
+            if (isSubscribed) {
+                setData(data.data)
+            }
         })()
+
+        return () => {
+            isSubscribed = false;
+        }
     }, [])
 
     return (
