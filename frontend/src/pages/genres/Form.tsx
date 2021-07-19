@@ -10,6 +10,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { Category, Genre } from '../../util/models';
 import SubmitActions from '../../components/SubmitActions';
+import { DefaultForm } from '../../components/DefaultForm';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -120,7 +121,10 @@ export const Form = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <DefaultForm
+            GridItemProps={{ xs: 12, md: 6 }}
+            onSubmit={handleSubmit(onSubmit)}
+        >
             <Controller
                 name="name"
                 control={control}
@@ -184,6 +188,6 @@ export const Form = () => {
                     isValid && onSubmit(getValues, null)
                 })}
             />
-        </form>
+        </DefaultForm>
     );
 };
