@@ -1,5 +1,4 @@
-import { Box, Button, FormControl, FormControlLabel, FormHelperText, FormLabel, makeStyles, Radio, RadioGroup, TextField, Theme } from '@material-ui/core';
-import { ButtonProps } from '@material-ui/core/Button';
+import { FormControl, FormControlLabel, FormHelperText, FormLabel, Radio, RadioGroup, TextField } from '@material-ui/core';
 import * as React from 'react';
 import { useForm, Controller } from "react-hook-form"
 import castMemberHttp from '../../util/http/models_http/cast_member_http';
@@ -9,14 +8,8 @@ import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { CastMember } from '../../util/models';
+import SubmitActions from '../../components/SubmitActions';
 
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-})
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -29,13 +22,13 @@ const validationSchema = yup.object().shape({
 })
 
 export const Form = () => {
-    const classes = useStyles();
     const {
         control,
         handleSubmit,
         getValues,
         formState: { errors },
         reset,
+        trigger
     } = useForm({
         defaultValues: {
             name: "",
@@ -116,13 +109,6 @@ export const Form = () => {
         }
     }
 
-    const buttonProps: ButtonProps = {
-        variant: "contained",
-        color: "secondary",
-        className: classes.submit,
-        disabled: loading
-    };
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
@@ -171,16 +157,12 @@ export const Form = () => {
                 />
             </FormControl>
 
-            <Box dir={"rtl"}>
-                <Button
-                    color={"primary"}
-                    {...buttonProps}
-                    onClick={() => onSubmit(getValues(), null)}
-                >
-                    Salvar
-                </Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions
+                disabledButtons={loading}
+                handleSave={() => trigger().then(isValid => {
+                    isValid && onSubmit(getValues, null)
+                })}
+            />
         </form>
     );
 };

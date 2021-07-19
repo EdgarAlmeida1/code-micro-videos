@@ -1,5 +1,4 @@
-import { Box, Button, Checkbox, FormControlLabel, makeStyles, TextField, Theme } from '@material-ui/core';
-import { ButtonProps } from '@material-ui/core/Button';
+import { Checkbox, FormControlLabel, TextField } from '@material-ui/core';
 import * as React from 'react';
 import { useForm, Controller } from "react-hook-form"
 import categoryHttp from '../../util/http/models_http/category_http';
@@ -9,14 +8,7 @@ import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { Category } from '../../util/models';
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-});
+import SubmitActions from '../../components/SubmitActions';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -26,14 +18,14 @@ const validationSchema = yup.object().shape({
 })
 
 export const Form = () => {
-    const classes = useStyles();
     const {
         handleSubmit,
         getValues,
         control,
         formState: { errors },
         reset,
-        watch
+        watch,
+        trigger
     } = useForm({
         defaultValues: {
             name: "",
@@ -112,14 +104,6 @@ export const Form = () => {
         }
     }
 
-    const buttonProps: ButtonProps = {
-        variant: "contained",
-        color: "secondary",
-        className: classes.submit,
-        disabled: loading
-    };
-
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
@@ -179,16 +163,12 @@ export const Form = () => {
                 }}
             />
 
-            <Box dir={"rtl"}>
-                <Button
-                    color={"primary"}
-                    {...buttonProps}
-                    onClick={() => onSubmit(getValues(), null)}
-                >
-                    Salvar
-                </Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions
+                disabledButtons={loading}
+                handleSave={() => trigger().then(isValid => {
+                    isValid && onSubmit(getValues, null)
+                })}
+            />
         </form>
     );
 };
