@@ -4,8 +4,11 @@ import { useEffect } from 'react';
 import castMemberHttp from '../../util/http/models_http/cast_member_http';
 import { format, parseISO } from "date-fns";
 import { CastMember, ListResponse } from '../../util/models';
-import DefaultTable, { TableColumn } from "../../components/Table"
+import DefaultTable, { makeActionStyles, TableColumn } from "../../components/Table"
 import { useSnackbar } from 'notistack';
+import EditIcon from '@material-ui/icons/Edit';
+import { IconButton, MuiThemeProvider } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const CastMemberTypes = {
     1: "Diretor",
@@ -50,6 +53,19 @@ const columnsDefinition: TableColumn[] = [
         name: "actions",
         label: "Ações",
         width: "13%",
+        options: {
+            customBodyRender: (value, tableMeta) => {
+                return (
+                    <IconButton
+                        color={"secondary"}
+                        component={Link}
+                        to={`/categories/${tableMeta.rowData[0]}/edit`}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                )
+            }
+        }
     },
 ];
 
@@ -86,15 +102,17 @@ const Table = (props: Props) => {
     }, [snackbar])
 
     return (
-        <DefaultTable
-            title="Listagem de categorias"
-            columns={columnsDefinition}
-            data={data}
-            loading={loading}
-            options={{
-                responsive: "simple"
-            }}
-        />
+        <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
+            <DefaultTable
+                title="Listagem de categorias"
+                columns={columnsDefinition}
+                data={data}
+                loading={loading}
+                options={{
+                    responsive: "simple"
+                }}
+            />
+        </MuiThemeProvider>
     );
 };
 

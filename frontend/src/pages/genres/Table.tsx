@@ -5,14 +5,17 @@ import { useEffect } from 'react';
 import genreHttp from '../../util/http/models_http/genre_http';
 import { format, parseISO } from "date-fns";
 import { Genre, ListResponse } from '../../util/models';
-import DefaultTable, { TableColumn } from "../../components/Table"
+import DefaultTable, { makeActionStyles, TableColumn } from "../../components/Table"
 import { useSnackbar } from 'notistack';
+import { IconButton, MuiThemeProvider } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import EditIcon from '@material-ui/icons/Edit';
 
 const columnsDefinition: TableColumn[] = [
     {
         name: "id",
         label: "ID",
-        width: "30%",
+        width: "25%",
         options: {
             sort: false
         }
@@ -20,12 +23,12 @@ const columnsDefinition: TableColumn[] = [
     {
         name: "name",
         label: "Nome",
-        width: "26%"
+        width: "23%"
     },
     {
         name: "categories",
         label: "Categorias",
-        width: "30%",
+        width: "25%",
         options: {
             customBodyRender(value: [], tableMeta, updateValue) {
                 let categories = value.map((category, index) => {
@@ -52,6 +55,24 @@ const columnsDefinition: TableColumn[] = [
         options: {
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), "dd/MM/yyyy")}</span>
+            }
+        }
+    },
+    {
+        name: "actions",
+        label: "Ações",
+        width: "13%",
+        options: {
+            customBodyRender: (value, tableMeta) => {
+                return (
+                    <IconButton
+                        color={"secondary"}
+                        component={Link}
+                        to={`/categories/${tableMeta.rowData[0]}/edit`}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                )
             }
         }
     },
@@ -90,15 +111,17 @@ const Table = (props: Props) => {
     }, [snackbar])
 
     return (
-        <DefaultTable
-            title="Listagem de categorias"
-            columns={columnsDefinition}
-            data={data}
-            loading={loading}
-            options={{
-                responsive: "simple"
-            }}
-        />
+        <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
+            <DefaultTable
+                title="Listagem de categorias"
+                columns={columnsDefinition}
+                data={data}
+                loading={loading}
+                options={{
+                    responsive: "simple"
+                }}
+            />
+        </MuiThemeProvider>
     );
 };
 
