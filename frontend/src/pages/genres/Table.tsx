@@ -68,7 +68,7 @@ const columnsDefinition: TableColumn[] = [
                     <IconButton
                         color={"secondary"}
                         component={Link}
-                        to={`/categories/${tableMeta.rowData[0]}/edit`}
+                        to={`/genres/${tableMeta.rowData[0]}/edit`}
                     >
                         <EditIcon />
                     </IconButton>
@@ -113,7 +113,7 @@ const Table = (props: Props) => {
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
             <DefaultTable
-                title="Listagem de categorias"
+                title="Listagem de gêneros"
                 columns={columnsDefinition}
                 data={data}
                 loading={loading}
