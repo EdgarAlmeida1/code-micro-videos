@@ -12,8 +12,10 @@
         "fideloper/proxy": "^4.0",
         "fruitcake/laravel-cors": "^2.0",
         "laravel/framework": "~6.18",
+        "laravel/helpers": "^1.4",
         "laravel/tinker": "^1.0",
-        "laravel/ui": "^1.0"
+        "laravel/ui": "^1.0",
+        "tucker-eric/eloquentfilter": "^3.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.3",

@@ -2,12 +2,13 @@ import MUIDataTable, { MUIDataTableColumn, MUIDataTableOptions, MUIDataTableProp
 import * as React from 'react';
 import { merge, omit, cloneDeep } from "lodash"
 import { useTheme, Theme, MuiThemeProvider, CircularProgress } from '@material-ui/core';
+import DebouncedTableSearch from './DebouncedTableSearch';
 
 export interface TableColumn extends MUIDataTableColumn {
     width?: string
 }
 
-const defaultOptions: MUIDataTableOptions = {
+const makeDefaultOptions = (debouncedSearchTime?) : MUIDataTableOptions => ({
     print: false,
     download: false,
     textLabels: {
@@ -43,11 +44,24 @@ const defaultOptions: MUIDataTableOptions = {
             deleteAria: "Excluir registros selecionados",
         },
     },
-}
+    customSearchRender: (searchText: any,
+        handleSearch: (text: string) => void,
+        hideSearch: () => void,
+        options: any) => {
+        return <DebouncedTableSearch
+            searchText={searchText}
+            onHide={hideSearch}
+            onSearch={handleSearch}
+            options={options}
+            debounceTime={debouncedSearchTime}
+        />
+    }
+})
 
 export interface TableProps extends MUIDataTableProps {
     columns: TableColumn[];
     loading?: boolean;
+    debouncedSearchTime?: number;
 }
 
 const Table = (props: TableProps) => {
@@ -69,7 +83,7 @@ const Table = (props: TableProps) => {
     }
 
     function applyLoading() {
-        newProps.options!.textLabels!.body!.noMatch = 
+        newProps.options!.textLabels!.body!.noMatch =
             newProps.loading ? <CircularProgress /> : newProps.options?.textLabels?.body?.noMatch
     }
 
@@ -78,6 +92,9 @@ const Table = (props: TableProps) => {
     }
 
     const theme = cloneDeep<Theme>(useTheme());
+
+    const defaultOptions = makeDefaultOptions(props.debouncedSearchTime)
+
     const newProps = merge(
         { options: cloneDeep(defaultOptions) },
         props,

@@ -44,7 +44,7 @@ class BasicCrudControllerTest extends TestCase
     {
         /** @var CategoryStub $category */
         $category = CategoryStub::create(['name' => 'test', 'description' => 'test']);
-        $result = $this->controller->index();
+        $result = $this->controller->index(new Request);
         $serialized = $result->response()->getData(true);
         
         $this->assertEquals(

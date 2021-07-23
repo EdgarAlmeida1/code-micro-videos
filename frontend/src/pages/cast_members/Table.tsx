@@ -27,7 +27,7 @@ const columnsDefinition: TableColumn[] = [
     {
         name: "name",
         label: "Nome",
-        width: "43%"
+        width: "41%"
     },
     {
         name: "type",
@@ -42,7 +42,7 @@ const columnsDefinition: TableColumn[] = [
     {
         name: "created_at",
         label: "Criado em",
-        width: "10%",
+        width: "12%",
         options: {
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), "dd/MM/yyyy")}</span>
@@ -104,7 +104,7 @@ const Table = (props: Props) => {
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
             <DefaultTable
-                title="Listagem de membros de elenco"
+                title=""
                 columns={columnsDefinition}
                 data={data}
                 loading={loading}
