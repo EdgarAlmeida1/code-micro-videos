@@ -4,14 +4,13 @@ import { format, parseISO } from "date-fns";
 import categoryHttp from '../../util/http/models_http/category_http';
 import { BadgeNo, BadgeYes } from '../../components/Badge';
 import { Category, ListResponse } from '../../util/models';
-import DefaultTable, { makeActionStyles, TableColumn } from "../../components/Table"
+import DefaultTable, { makeActionStyles, MuiDataTableRefComponent, TableColumn } from "../../components/Table"
 import { useSnackbar } from 'notistack';
 import { IconButton, MuiThemeProvider } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { Link } from 'react-router-dom';
 import { FilterResetButton } from '../../components/Table/FilterResetButton';
 import useFilter from '../../hooks/useFilter';
-import { Creators } from '../../store/filter';
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -19,19 +18,28 @@ const columnsDefinition: TableColumn[] = [
         label: "ID",
         width: "30%",
         options: {
-            sort: false
+            sort: false,
+            filter: false
         }
     },
     {
         name: "name",
         label: "Nome",
         width: "41%",
+        options: {
+            filter: false
+        }
     },
     {
         name: "is_active",
         label: "Ativo?",
         width: "4%",
         options: {
+            filter: false,
+            filterOptions: {
+                names: ["Sim", "Não"],
+                fullWidth: true
+            },
             customBodyRender(value, tableMeta, updateValue) {
                 return value ? <BadgeYes /> : <BadgeNo />
             }
@@ -42,6 +50,7 @@ const columnsDefinition: TableColumn[] = [
         label: "Criado em",
         width: "12%",
         options: {
+            filter: false,
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), "dd/MM/yyyy")}</span>
             }
@@ -53,6 +62,7 @@ const columnsDefinition: TableColumn[] = [
         width: "13%",
         options: {
             sort: false,
+            filter: false,
             customBodyRender: (value, tableMeta) => {
                 return (
                     <IconButton
@@ -78,18 +88,19 @@ const Table = () => {
     const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([])
     const [loading, setLoading] = useState(false)
+    const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>
     const {
         filterManager,
         filterState,
         debouncedFilterState,
-        dispatch,
         totalRecords,
         setTotalRecords
     } = useFilter({
         columns: columnsDefinition,
         debounceTime: debounceTime,
         rowsPerPage,
-        rowsPerPageOptions
+        rowsPerPageOptions,
+        tableRef
     });
 
     useEffect(() => {
@@ -141,9 +152,10 @@ const Table = () => {
                 loading={loading}
                 debouncedSearchTime={debounceSearchTime}
                 options={{
+                    filter: false,
                     customToolbar: () => (
                         <FilterResetButton
-                            handleClick={() => dispatch(Creators.setReset())}
+                            handleClick={() => filterManager.resetFilter()}
                         />
                     ),
                     serverSide: true,

@@ -7,19 +7,22 @@ export const {Types, Creators} = createActions<{
     SET_PER_PAGE: string,
     SET_ORDER: string,
     SET_RESET: string,
+    UPDATE_EXTRA_FILTER: string
 }, {
     setSearch(payload: Typings.SetSearchAction['payload']) : Typings.SetSearchAction
     setPage(payload: Typings.SetPageAction['payload']) : Typings.SetPageAction
     setPerPage(payload: Typings.SetPerPageAction['payload']) : Typings.SetPerPageAction
     setOrder(payload: Typings.SetOrderAction['payload']) : Typings.SetOrderAction
-    setReset() : Typings.SetResetAction,
+    setReset(payload: Typings.SetResetAction['payload']) : Typings.SetResetAction
+    updateExtraFilter(payload: Typings.UpdateExtraFilterAction['payload']) : Typings.UpdateExtraFilterAction
 }>
 ({
     setSearch: ['payload'],
     setPage: ['payload'],
     setPerPage: ['payload'],
     setOrder: ['payload'],
-    setReset: []
+    setReset: ['payload'],
+    updateExtraFilter: ['payload'],
 })
 
 export const INITIAL_STATE : Typings.State = {
@@ -40,6 +43,7 @@ const reducer = createReducer(INITIAL_STATE, {
     [Types.SET_PER_PAGE]: setPerPage,
     [Types.SET_ORDER]: setOrder,
     [Types.SET_RESET]: setReset,
+    [Types.UPDATE_EXTRA_FILTER]: updateExtraFilter,
 })
 
 export default reducer;
@@ -86,8 +90,16 @@ function setOrder(state = INITIAL_STATE, action: Typings.SetOrderAction): Typing
         }
     }
 }
-function setReset(state = INITIAL_STATE, action: Typings.SetOrderAction): Typings.State {
+function setReset(state = INITIAL_STATE, action: Typings.SetResetAction): Typings.State {
+    return action.payload.state;
+}
+
+function updateExtraFilter(state = INITIAL_STATE, action: Typings.UpdateExtraFilterAction): Typings.State {
     return {
-        ...INITIAL_STATE,
+        ...state,
+        extraFilter: {
+            ...state.extraFilter,
+            ...action.payload
+        }
     }
 }

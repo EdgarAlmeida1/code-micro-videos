@@ -1,5 +1,5 @@
 import { MUIDataTableColumn } from "mui-datatables"
-import { Dispatch, Reducer, useEffect, useReducer, useState } from "react"
+import React, { Dispatch, Reducer, useEffect, useReducer, useState } from "react"
 import reducer, { Creators } from "../store/filter"
 import { State as FilterState, Actions as FilterActions } from "../store/filter/types"
 import { useDebounce } from "use-debounce"
@@ -7,6 +7,7 @@ import { useHistory } from "react-router"
 import { History } from 'history'
 import { isEqual } from 'lodash'
 import * as yup from '../util/vendor/yup';
+import { MuiDataTableRefComponent } from "../components/Table"
 
 interface FilterManagerOptions {
     columns: MUIDataTableColumn[];
@@ -14,6 +15,14 @@ interface FilterManagerOptions {
     rowsPerPageOptions: number[];
     debounceTime: number;
     history: History;
+    tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+    extraFilter?: ExtraFilter
+}
+
+interface ExtraFilter {
+    getStateFromURL: (queryParams: URLSearchParams) => any,
+    formatSearchParams: (debouncedState: FilterState) => any,
+    createValidationSchema: () => any
 }
 
 interface UseFilterOptions extends Omit<FilterManagerOptions, "history"> { }
@@ -52,13 +61,17 @@ export class FilterManager {
     rowsPerPage: number;
     rowsPerPageOptions: number[];
     history: History;
+    tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+    extraFilter?: ExtraFilter;
 
     constructor(options: FilterManagerOptions) {
-        const { columns, rowsPerPage, rowsPerPageOptions, history } = options;
+        const { columns, rowsPerPage, rowsPerPageOptions, history, tableRef, extraFilter } = options;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
         this.rowsPerPageOptions = rowsPerPageOptions;
         this.history = history;
+        this.tableRef = tableRef;
+        this.extraFilter = extraFilter;
         this.createValidationSchema();
     }
 
@@ -75,6 +88,15 @@ export class FilterManager {
         this.dispatch(Creators.setOrder({
             name: changedColumn,
             direction: direction.includes("desc") ? "desc" : "asc"
+        }))
+    }
+    changeExtraFilter(data) {
+        this.dispatch(Creators.updateExtraFilter(data))
+    }
+    resetFilter() {
+        const INITIAL_STATE = this.schema.cast({})
+        this.dispatch(Creators.setReset({
+            state: INITIAL_STATE
         }))
     }
 
@@ -109,7 +131,10 @@ export class FilterManager {
             ...(this.state.order.direction !== "none" && {
                 name: this.state.order.name,
                 direction: this.state.order.direction
-            })
+            }),
+            ...(
+                this.extraFilter && this.extraFilter.formatSearchParams(this.state)
+            )
         }
     }
 
@@ -125,6 +150,11 @@ export class FilterManager {
                 name: queryParams.get("name"),
                 direction: queryParams.get("direction"),
             },
+            ...(
+                this.extraFilter && {
+                    extraFilter: this.extraFilter.getStateFromURL(queryParams)
+                }
+            )
         })
     }
 
@@ -156,6 +186,11 @@ export class FilterManager {
                     .transform(value => !value || ['asc', 'desc'].includes(value.toLowerCase()) ? undefined : value)
                     .default("none")
             }),
+            ...(
+                this.extraFilter && {
+                    extraFilter: this.extraFilter.createValidationSchema()
+                }
+            )
         })
     }
 }
